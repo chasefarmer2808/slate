@@ -135,7 +135,7 @@ export type TextOperation = InsertTextOperation | RemoveTextOperation
  * collaboration, and other features.
  */
 
-export type Operation = NodeOperation | SelectionOperation | TextOperation
+export type Operation = (NodeOperation | SelectionOperation | TextOperation) & {source?: string}
 
 export interface OperationInterface {
   isNodeOperation: (value: any) => value is NodeOperation
