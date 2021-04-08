@@ -10,6 +10,7 @@ import {
   Range,
   Transforms,
 } from '..'
+import {SOURCE} from "../utils/string";
 
 export interface TextTransforms {
   delete: (
@@ -21,7 +22,8 @@ export interface TextTransforms {
       reverse?: boolean
       hanging?: boolean
       voids?: boolean
-    }
+    },
+    source?: SOURCE | string,
   ) => void
   insertFragment: (
     editor: Editor,
@@ -30,7 +32,8 @@ export interface TextTransforms {
       at?: Location
       hanging?: boolean
       voids?: boolean
-    }
+    },
+    source?: SOURCE | string,
   ) => void
   insertText: (
     editor: Editor,
@@ -38,7 +41,8 @@ export interface TextTransforms {
     options?: {
       at?: Location
       voids?: boolean
-    }
+    },
+    source?: SOURCE | string,
   ) => void
 }
 
@@ -56,7 +60,8 @@ export const TextTransforms: TextTransforms = {
       reverse?: boolean
       hanging?: boolean
       voids?: boolean
-    } = {}
+    } = {},
+    source = SOURCE.API.valueOf(),
   ): void {
     Editor.withoutNormalizing(editor, () => {
       const {
@@ -196,7 +201,7 @@ export const TextTransforms: TextTransforms = {
         const { path } = point
         const offset = isSingleText ? start.offset : 0
         const text = node.text.slice(offset, end.offset)
-        editor.apply({ type: 'remove_text', path, offset, text })
+        editor.apply({ type: 'remove_text', path, offset, text, source })
       }
 
       if (
@@ -233,7 +238,8 @@ export const TextTransforms: TextTransforms = {
       at?: Location
       hanging?: boolean
       voids?: boolean
-    } = {}
+    } = {},
+    source = SOURCE.API.valueOf()
   ): void {
     Editor.withoutNormalizing(editor, () => {
       const { hanging = false, voids = false } = options
@@ -400,21 +406,21 @@ export const TextTransforms: TextTransforms = {
         match: n => Text.isText(n) || Editor.isInline(editor, n),
         mode: 'highest',
         voids,
-      })
+      }, source)
 
       Transforms.insertNodes(editor, middles, {
         at: middleRef.current!,
         match: n => Editor.isBlock(editor, n),
         mode: 'lowest',
         voids,
-      })
+      }, source)
 
       Transforms.insertNodes(editor, ends, {
         at: endRef.current!,
         match: n => Text.isText(n) || Editor.isInline(editor, n),
         mode: 'highest',
         voids,
-      })
+      }, source)
 
       if (!options.at) {
         let path
@@ -447,7 +453,8 @@ export const TextTransforms: TextTransforms = {
     options: {
       at?: Location
       voids?: boolean
-    } = {}
+    } = {},
+    source = SOURCE.API.valueOf()
   ): void {
     Editor.withoutNormalizing(editor, () => {
       const { voids = false } = options
@@ -483,7 +490,7 @@ export const TextTransforms: TextTransforms = {
       }
 
       const { path, offset } = at
-      editor.apply({ type: 'insert_text', path, offset, text })
+      editor.apply({ type: 'insert_text', path, offset, text, source })
     })
   },
 }

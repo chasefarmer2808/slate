@@ -12,6 +12,7 @@ import {
   Ancestor,
 } from '..'
 import { NodeMatch } from '../interfaces/editor'
+import {SOURCE} from "../utils/string";
 
 export interface NodeTransforms {
   insertNodes: <T extends Node>(
@@ -24,7 +25,8 @@ export interface NodeTransforms {
       hanging?: boolean
       select?: boolean
       voids?: boolean
-    }
+    },
+    source?: SOURCE | string,
   ) => void
   liftNodes: <T extends Node>(
     editor: Editor,
@@ -33,7 +35,8 @@ export interface NodeTransforms {
       match?: NodeMatch<T>
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
-    }
+    },
+    source?: SOURCE | string,
   ) => void
   mergeNodes: <T extends Node>(
     editor: Editor,
@@ -43,7 +46,8 @@ export interface NodeTransforms {
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
-    }
+    },
+    source?: SOURCE | string,
   ) => void
   moveNodes: <T extends Node>(
     editor: Editor,
@@ -53,7 +57,8 @@ export interface NodeTransforms {
       mode?: 'all' | 'highest' | 'lowest'
       to: Path
       voids?: boolean
-    }
+    },
+    source?: SOURCE | string,
   ) => void
   removeNodes: <T extends Node>(
     editor: Editor,
@@ -63,7 +68,8 @@ export interface NodeTransforms {
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
-    }
+    },
+    source?: SOURCE | string,
   ) => void
   setNodes: <T extends Node>(
     editor: Editor,
@@ -75,7 +81,8 @@ export interface NodeTransforms {
       hanging?: boolean
       split?: boolean
       voids?: boolean
-    }
+    },
+    source?: SOURCE | string,
   ) => void
   splitNodes: <T extends Node>(
     editor: Editor,
@@ -86,7 +93,8 @@ export interface NodeTransforms {
       always?: boolean
       height?: number
       voids?: boolean
-    }
+    },
+    source?: SOURCE | string,
   ) => void
   unsetNodes: <T extends Node>(
     editor: Editor,
@@ -97,7 +105,8 @@ export interface NodeTransforms {
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
-    }
+    },
+    source?: SOURCE | string,
   ) => void
   unwrapNodes: <T extends Node>(
     editor: Editor,
@@ -107,7 +116,8 @@ export interface NodeTransforms {
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
-    }
+    },
+    source?: SOURCE | string,
   ) => void
   wrapNodes: <T extends Node>(
     editor: Editor,
@@ -118,7 +128,8 @@ export interface NodeTransforms {
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
-    }
+    },
+    source?: SOURCE | string,
   ) => void
 }
 
@@ -137,7 +148,8 @@ export const NodeTransforms: NodeTransforms = {
       hanging?: boolean
       select?: boolean
       voids?: boolean
-    } = {}
+    } = {},
+    source = SOURCE.API.valueOf(),
   ): void {
     Editor.withoutNormalizing(editor, () => {
       const { hanging = false, voids = false, mode = 'lowest' } = options
@@ -209,7 +221,7 @@ export const NodeTransforms: NodeTransforms = {
           const [, matchPath] = entry
           const pathRef = Editor.pathRef(editor, matchPath)
           const isAtEnd = Editor.isEnd(editor, at, matchPath)
-          Transforms.splitNodes(editor, { at, match, mode, voids })
+          Transforms.splitNodes(editor, { at, match, mode, voids }, source)
           const path = pathRef.unref()!
           at = isAtEnd ? Path.next(path) : path
         } else {
@@ -252,7 +264,8 @@ export const NodeTransforms: NodeTransforms = {
       match?: NodeMatch<T>
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
-    } = {}
+    } = {},
+    source = SOURCE.API.valueOf(),
   ): void {
     Editor.withoutNormalizing(editor, () => {
       const { at = editor.selection, mode = 'lowest', voids = false } = options
@@ -287,18 +300,18 @@ export const NodeTransforms: NodeTransforms = {
 
         if (length === 1) {
           const toPath = Path.next(parentPath)
-          Transforms.moveNodes(editor, { at: path, to: toPath, voids })
-          Transforms.removeNodes(editor, { at: parentPath, voids })
+          Transforms.moveNodes(editor,  { at: path, to: toPath, voids }, source)
+          Transforms.removeNodes(editor,  { at: parentPath, voids }, source)
         } else if (index === 0) {
-          Transforms.moveNodes(editor, { at: path, to: parentPath, voids })
+          Transforms.moveNodes(editor,  { at: path, to: parentPath, voids }, source)
         } else if (index === length - 1) {
           const toPath = Path.next(parentPath)
-          Transforms.moveNodes(editor, { at: path, to: toPath, voids })
+          Transforms.moveNodes(editor,  { at: path, to: toPath, voids }, source)
         } else {
           const splitPath = Path.next(path)
           const toPath = Path.next(parentPath)
-          Transforms.splitNodes(editor, { at: splitPath, voids })
-          Transforms.moveNodes(editor, { at: path, to: toPath, voids })
+          Transforms.splitNodes(editor,  { at: splitPath, voids }, source)
+          Transforms.moveNodes(editor,  { at: path, to: toPath, voids }, source)
         }
       }
     })
@@ -317,7 +330,8 @@ export const NodeTransforms: NodeTransforms = {
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
-    } = {}
+    } = {},
+    source = SOURCE.API.valueOf(),
   ): void {
     Editor.withoutNormalizing(editor, () => {
       let { match, at = editor.selection } = options
@@ -409,13 +423,13 @@ export const NodeTransforms: NodeTransforms = {
       // If the node isn't already the next sibling of the previous node, move
       // it so that it is before merging.
       if (!isPreviousSibling) {
-        Transforms.moveNodes(editor, { at: path, to: newPath, voids })
+        Transforms.moveNodes(editor,  { at: path, to: newPath, voids }, source)
       }
 
       // If there was going to be an empty ancestor of the node that was merged,
       // we remove it from the tree.
       if (emptyRef) {
-        Transforms.removeNodes(editor, { at: emptyRef.current!, voids })
+        Transforms.removeNodes(editor,  { at: emptyRef.current!, voids }, source)
       }
 
       // If the target node that we're merging with is empty, remove it instead
@@ -426,7 +440,7 @@ export const NodeTransforms: NodeTransforms = {
         (Element.isElement(prevNode) && Editor.isEmpty(editor, prevNode)) ||
         (Text.isText(prevNode) && prevNode.text === '')
       ) {
-        Transforms.removeNodes(editor, { at: prevPath, voids })
+        Transforms.removeNodes(editor,  { at: prevPath, voids }, source)
       } else {
         editor.apply({
           type: 'merge_node',
@@ -454,7 +468,8 @@ export const NodeTransforms: NodeTransforms = {
       mode?: 'all' | 'highest' | 'lowest'
       to: Path
       voids?: boolean
-    }
+    },
+    source = SOURCE.API.valueOf()
   ): void {
     Editor.withoutNormalizing(editor, () => {
       const {
@@ -484,7 +499,7 @@ export const NodeTransforms: NodeTransforms = {
         const newPath = toRef.current!
 
         if (path.length !== 0) {
-          editor.apply({ type: 'move_node', path, newPath })
+          editor.apply({ type: 'move_node', path, newPath, source })
         }
 
         if (
@@ -515,7 +530,8 @@ export const NodeTransforms: NodeTransforms = {
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
-    } = {}
+    } = {},
+    source = SOURCE.API.valueOf(),
   ): void {
     Editor.withoutNormalizing(editor, () => {
       const { hanging = false, voids = false, mode = 'lowest' } = options
@@ -543,7 +559,7 @@ export const NodeTransforms: NodeTransforms = {
 
         if (path) {
           const [node] = Editor.node(editor, path)
-          editor.apply({ type: 'remove_node', path, node })
+          editor.apply({ type: 'remove_node', path, node, source })
         }
       }
     })
@@ -563,7 +579,8 @@ export const NodeTransforms: NodeTransforms = {
       hanging?: boolean
       split?: boolean
       voids?: boolean
-    } = {}
+    } = {},
+    source = SOURCE.API.valueOf()
   ): void {
     Editor.withoutNormalizing(editor, () => {
       let { match, at = editor.selection } = options
@@ -597,13 +614,13 @@ export const NodeTransforms: NodeTransforms = {
           match,
           mode: splitMode,
           voids,
-        })
+        }, source)
         Transforms.splitNodes(editor, {
           at: start,
           match,
           mode: splitMode,
           voids,
-        })
+        }, source)
         at = rangeRef.unref()!
 
         if (options.at == null) {
@@ -642,6 +659,7 @@ export const NodeTransforms: NodeTransforms = {
             path,
             properties,
             newProperties,
+            source
           })
         }
       }
@@ -661,7 +679,8 @@ export const NodeTransforms: NodeTransforms = {
       always?: boolean
       height?: number
       voids?: boolean
-    } = {}
+    } = {},
+    source = SOURCE.API.valueOf()
   ): void {
     Editor.withoutNormalizing(editor, () => {
       const { mode = 'lowest', voids = false } = options
@@ -712,7 +731,7 @@ export const NodeTransforms: NodeTransforms = {
           if (!after) {
             const text = { text: '' }
             const afterPath = Path.next(voidPath)
-            Transforms.insertNodes(editor, text, { at: afterPath, voids })
+            Transforms.insertNodes(editor, text, { at: afterPath, voids }, source)
             after = Editor.point(editor, afterPath)!
           }
 
@@ -757,6 +776,7 @@ export const NodeTransforms: NodeTransforms = {
             path,
             position,
             properties,
+            source
           })
         }
 
@@ -786,7 +806,8 @@ export const NodeTransforms: NodeTransforms = {
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
-    } = {}
+    } = {},
+    source = SOURCE.API.valueOf()
   ): void {
     if (!Array.isArray(props)) {
       props = [props]
@@ -798,7 +819,7 @@ export const NodeTransforms: NodeTransforms = {
       obj[key] = null
     }
 
-    Transforms.setNodes(editor, obj, options)
+    Transforms.setNodes(editor, obj, options, source)
   },
 
   /**
@@ -814,7 +835,8 @@ export const NodeTransforms: NodeTransforms = {
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
-    } = {}
+    } = {},
+    source = SOURCE.API.valueOf()
   ): void {
     Editor.withoutNormalizing(editor, () => {
       const { mode = 'lowest', split = false, voids = false } = options
@@ -851,7 +873,7 @@ export const NodeTransforms: NodeTransforms = {
           at: range,
           match: n => Element.isAncestor(node) && node.children.includes(n),
           voids,
-        })
+        }, source)
       }
 
       if (rangeRef) {
@@ -874,7 +896,8 @@ export const NodeTransforms: NodeTransforms = {
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
-    } = {}
+    } = {},
+    source= SOURCE.API.valueOf()
   ): void {
     Editor.withoutNormalizing(editor, () => {
       const { mode = 'lowest', split = false, voids = false } = options
@@ -899,8 +922,8 @@ export const NodeTransforms: NodeTransforms = {
         const rangeRef = Editor.rangeRef(editor, at, {
           affinity: 'inward',
         })
-        Transforms.splitNodes(editor, { at: end, match, voids })
-        Transforms.splitNodes(editor, { at: start, match, voids })
+        Transforms.splitNodes(editor, { at: end, match, voids }, source)
+        Transforms.splitNodes(editor, { at: start, match, voids }, source)
         at = rangeRef.unref()!
 
         if (options.at == null) {
@@ -947,7 +970,7 @@ export const NodeTransforms: NodeTransforms = {
           const depth = commonPath.length + 1
           const wrapperPath = Path.next(lastPath.slice(0, depth))
           const wrapper = { ...element, children: [] }
-          Transforms.insertNodes(editor, wrapper, { at: wrapperPath, voids })
+          Transforms.insertNodes(editor, wrapper, { at: wrapperPath, voids }, source)
 
           Transforms.moveNodes(editor, {
             at: range,
@@ -955,7 +978,7 @@ export const NodeTransforms: NodeTransforms = {
               Element.isAncestor(commonNode) && commonNode.children.includes(n),
             to: wrapperPath.concat(0),
             voids,
-          })
+          }, source)
         }
       }
     })

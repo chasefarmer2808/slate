@@ -198,3 +198,9 @@ const isBMPEmoji = (code: number): boolean => {
     code === 0x25ef // large circle (◯)
   )
 }
+
+export enum SOURCE {
+  API = 'api',
+  USER = 'user',
+  SILENT = 'silent'
+}
