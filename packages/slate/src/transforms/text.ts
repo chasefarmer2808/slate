@@ -23,7 +23,7 @@ export interface TextTransforms {
       hanging?: boolean
       voids?: boolean
     },
-    source?: SOURCE | string,
+    source?: string,
   ) => void
   insertFragment: (
     editor: Editor,
@@ -33,7 +33,7 @@ export interface TextTransforms {
       hanging?: boolean
       voids?: boolean
     },
-    source?: SOURCE | string,
+    source?: string,
   ) => void
   insertText: (
     editor: Editor,
@@ -42,7 +42,7 @@ export interface TextTransforms {
       at?: Location
       voids?: boolean
     },
-    source?: SOURCE | string,
+    source?: string,
   ) => void
 }
 
@@ -187,12 +187,12 @@ export const TextTransforms: TextTransforms = {
         const { path } = point
         const { offset } = start
         const text = node.text.slice(offset)
-        editor.apply({ type: 'remove_text', path, offset, text })
+        editor.apply({ type: 'remove_text', path, offset, text, source })
       }
 
       for (const pathRef of pathRefs) {
         const path = pathRef.unref()!
-        Transforms.removeNodes(editor, { at: path, voids })
+        Transforms.removeNodes(editor, { at: path, voids }, source)
       }
 
       if (!endVoid) {

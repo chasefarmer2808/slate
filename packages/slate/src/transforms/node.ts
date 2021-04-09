@@ -26,7 +26,7 @@ export interface NodeTransforms {
       select?: boolean
       voids?: boolean
     },
-    source?: SOURCE | string,
+    source?: string,
   ) => void
   liftNodes: <T extends Node>(
     editor: Editor,
@@ -36,7 +36,7 @@ export interface NodeTransforms {
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     },
-    source?: SOURCE | string,
+    source?: string,
   ) => void
   mergeNodes: <T extends Node>(
     editor: Editor,
@@ -47,7 +47,7 @@ export interface NodeTransforms {
       hanging?: boolean
       voids?: boolean
     },
-    source?: SOURCE | string,
+    source?: string,
   ) => void
   moveNodes: <T extends Node>(
     editor: Editor,
@@ -58,7 +58,7 @@ export interface NodeTransforms {
       to: Path
       voids?: boolean
     },
-    source?: SOURCE | string,
+    source?: string,
   ) => void
   removeNodes: <T extends Node>(
     editor: Editor,
@@ -69,7 +69,7 @@ export interface NodeTransforms {
       hanging?: boolean
       voids?: boolean
     },
-    source?: SOURCE | string,
+    source?: string,
   ) => void
   setNodes: <T extends Node>(
     editor: Editor,
@@ -82,7 +82,7 @@ export interface NodeTransforms {
       split?: boolean
       voids?: boolean
     },
-    source?: SOURCE | string,
+    source?: string,
   ) => void
   splitNodes: <T extends Node>(
     editor: Editor,
@@ -94,7 +94,7 @@ export interface NodeTransforms {
       height?: number
       voids?: boolean
     },
-    source?: SOURCE | string,
+    source?: string,
   ) => void
   unsetNodes: <T extends Node>(
     editor: Editor,
@@ -106,7 +106,7 @@ export interface NodeTransforms {
       split?: boolean
       voids?: boolean
     },
-    source?: SOURCE | string,
+    source?: string,
   ) => void
   unwrapNodes: <T extends Node>(
     editor: Editor,
@@ -117,7 +117,7 @@ export interface NodeTransforms {
       split?: boolean
       voids?: boolean
     },
-    source?: SOURCE | string,
+    source?: string,
   ) => void
   wrapNodes: <T extends Node>(
     editor: Editor,
@@ -129,7 +129,7 @@ export interface NodeTransforms {
       split?: boolean
       voids?: boolean
     },
-    source?: SOURCE | string,
+    source?: string,
   ) => void
 }
 
@@ -239,7 +239,7 @@ export const NodeTransforms: NodeTransforms = {
       for (const node of nodes) {
         const path = parentPath.concat(index)
         index++
-        editor.apply({ type: 'insert_node', path, node })
+        editor.apply({ type: 'insert_node', path, node, source })
       }
 
       if (select) {
@@ -447,6 +447,7 @@ export const NodeTransforms: NodeTransforms = {
           path: newPath,
           position,
           properties,
+          source,
         })
       }
 
