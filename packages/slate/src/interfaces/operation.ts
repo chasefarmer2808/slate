@@ -1,6 +1,6 @@
 import { ExtendedType, Node, Path, Range } from '..'
 import isPlainObject from 'is-plain-object'
-import {SOURCE} from "../utils/string";
+import { SOURCE } from '../utils/string'
 
 export type BaseInsertNodeOperation = {
   type: 'insert_node'
@@ -136,7 +136,9 @@ export type TextOperation = InsertTextOperation | RemoveTextOperation
  * collaboration, and other features.
  */
 
-export type Operation = (NodeOperation | SelectionOperation | TextOperation) & {source?: SOURCE | string}
+export type Operation = (NodeOperation | SelectionOperation | TextOperation) & {
+  source?: SOURCE | string
+}
 
 export interface OperationInterface {
   isNodeOperation: (value: any) => value is NodeOperation

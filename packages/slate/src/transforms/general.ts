@@ -25,7 +25,7 @@ export const GeneralTransforms: GeneralTransforms = {
   transform(editor: Editor, op: Operation): void {
     // Default to api calls as the source of the operation.
     if (op.source === undefined) {
-      op.source = 'api';
+      op.source = 'api'
     }
     editor.children = createDraft(editor.children)
     let selection = editor.selection && createDraft(editor.selection)

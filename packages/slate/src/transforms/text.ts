@@ -10,7 +10,7 @@ import {
   Range,
   Transforms,
 } from '..'
-import {SOURCE} from "../utils/string";
+import { SOURCE } from '../utils/string'
 
 export interface TextTransforms {
   delete: (
@@ -23,7 +23,7 @@ export interface TextTransforms {
       hanging?: boolean
       voids?: boolean
     },
-    source?: string,
+    source?: string
   ) => void
   insertFragment: (
     editor: Editor,
@@ -33,7 +33,7 @@ export interface TextTransforms {
       hanging?: boolean
       voids?: boolean
     },
-    source?: string,
+    source?: string
   ) => void
   insertText: (
     editor: Editor,
@@ -42,7 +42,7 @@ export interface TextTransforms {
       at?: Location
       voids?: boolean
     },
-    source?: string,
+    source?: string
   ) => void
 }
 
@@ -61,7 +61,7 @@ export const TextTransforms: TextTransforms = {
       hanging?: boolean
       voids?: boolean
     } = {},
-    source = SOURCE.API.valueOf(),
+    source = SOURCE.API.valueOf()
   ): void {
     Editor.withoutNormalizing(editor, () => {
       const {
@@ -401,26 +401,41 @@ export const TextTransforms: TextTransforms = {
           : inlinePath
       )
 
-      Transforms.insertNodes(editor, starts, {
-        at: startRef.current!,
-        match: n => Text.isText(n) || Editor.isInline(editor, n),
-        mode: 'highest',
-        voids,
-      }, source)
+      Transforms.insertNodes(
+        editor,
+        starts,
+        {
+          at: startRef.current!,
+          match: n => Text.isText(n) || Editor.isInline(editor, n),
+          mode: 'highest',
+          voids,
+        },
+        source
+      )
 
-      Transforms.insertNodes(editor, middles, {
-        at: middleRef.current!,
-        match: n => Editor.isBlock(editor, n),
-        mode: 'lowest',
-        voids,
-      }, source)
+      Transforms.insertNodes(
+        editor,
+        middles,
+        {
+          at: middleRef.current!,
+          match: n => Editor.isBlock(editor, n),
+          mode: 'lowest',
+          voids,
+        },
+        source
+      )
 
-      Transforms.insertNodes(editor, ends, {
-        at: endRef.current!,
-        match: n => Text.isText(n) || Editor.isInline(editor, n),
-        mode: 'highest',
-        voids,
-      }, source)
+      Transforms.insertNodes(
+        editor,
+        ends,
+        {
+          at: endRef.current!,
+          match: n => Text.isText(n) || Editor.isInline(editor, n),
+          mode: 'highest',
+          voids,
+        },
+        source
+      )
 
       if (!options.at) {
         let path

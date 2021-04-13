@@ -202,5 +202,5 @@ const isBMPEmoji = (code: number): boolean => {
 export enum SOURCE {
   API = 'api',
   USER = 'user',
-  SILENT = 'silent'
+  SILENT = 'silent',
 }
